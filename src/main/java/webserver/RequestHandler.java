@@ -21,6 +21,7 @@ import util.ParseUtils;
 public class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 	private static final String root = "./webapp"; 
+	private static final String[] ContentTypes= {"html/text", "text/css"};
 	private Socket connection;
 
 	public RequestHandler(Socket connectionSocket) {
@@ -43,6 +44,7 @@ public class RequestHandler extends Thread {
 				/* 
 				 * 정규 표현식으로 Request line 헤더임을 확인하고 맞으면 헤더 형식에 맞춰 파싱한다.
 				 */
+				System.out.println(request);
 				Pattern pattern = Pattern.compile("^(?:GET|POST|PUT|DELETE)\\s+.*");
 				Matcher match = pattern.matcher(request);
 				if(match.matches())
@@ -58,18 +60,22 @@ public class RequestHandler extends Thread {
 			byte[] body = Files.readAllBytes(new File(root + url).toPath());
 			DataOutputStream dos = new DataOutputStream(out);
 			
-	
-			response200Header(dos, body.length);
+			int pos = url.lastIndexOf( "." );
+			String ext = url.substring( pos + 1 );
+	        if(ext.equals("css"))
+	        	response200Header(dos, body.length, "text/css");
+	        else 
+	        	response200Header(dos, body.length, "text/html");
 			responseBody(dos, body);
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
 	}
 
-	private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+	private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String ContentType) {
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+			dos.writeBytes("Content-Type: "+ContentType+";charset=utf-8\r\n");
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {

@@ -17,6 +17,6 @@ public class ParseUtils {
         parseMap.put("method", parse[0]);
         parseMap.put("URL", parse[1]);
         parseMap.put("Version", parse[2]);
-		return parseMap;
+        return parseMap;
     }
 }
