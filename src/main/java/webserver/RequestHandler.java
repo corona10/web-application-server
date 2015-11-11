@@ -44,7 +44,7 @@ public class RequestHandler extends Thread {
 				/* 
 				 * 정규 표현식으로 Request line 헤더임을 확인하고 맞으면 헤더 형식에 맞춰 파싱한다.
 				 */
-				System.out.println(request);
+				//System.out.println(request);
 				Pattern pattern = Pattern.compile("^(?:GET|POST|PUT|DELETE)\\s+.*");
 				Matcher match = pattern.matcher(request);
 				if(match.matches())
@@ -53,23 +53,40 @@ public class RequestHandler extends Thread {
 					url = result.get("URL");
 				}
 			}
-			if(url.equals("/"))
-			{
-				url = "/index.html";
-			}
-			byte[] body = Files.readAllBytes(new File(root + url).toPath());
+			File file = new File(root + url);
 			DataOutputStream dos = new DataOutputStream(out);
-			
-			int pos = url.lastIndexOf( "." );
-			String ext = url.substring( pos + 1 );
-	        if(ext.equals("css"))
-	        	response200Header(dos, body.length, "text/css");
-	        else 
-	        	response200Header(dos, body.length, "text/html");
-			responseBody(dos, body);
+			if(file.isFile())
+			{
+				byte[] body = Files.readAllBytes(new File(root + url).toPath());
+				String ext = parseutils.getExt(url);
+			    // 요청 URL이 css파일인 경우 text/css로 보내준다.
+			    if(ext.equals("css"))
+			    {
+			        response200Header(dos, body.length, "text/css");
+				}else{
+					response200Header(dos, body.length, "text/html");			
+				}
+			    
+			    responseBody(dos, body);
+			}else{
+				 response302Header(dos);
+			}
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
+	}
+
+	private void response302Header(DataOutputStream dos) {
+		// TODO Auto-generated method stub
+		try{
+			dos.writeBytes("HTTP/1.1 302 Found \r\n");
+		    dos.writeBytes("Location: /index.html \r\n");
+		    dos.writeBytes("\r\n");
+		}catch(IOException e)
+		{
+			log.error(e.getMessage());
+		}
+		
 	}
 
 	private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String ContentType) {
@@ -93,8 +110,13 @@ public class RequestHandler extends Thread {
 		}
 	}
 	
-	private void processRequest(InputStream is)
+	private void response404Header(DataOutputStream dos)
 	{
-		
+		try{
+			dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+		}catch(IOException e)
+		{
+			log.error(e.getMessage());
+		}
 	}
 }

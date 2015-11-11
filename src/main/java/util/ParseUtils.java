@@ -15,8 +15,30 @@ public class ParseUtils {
     	String[] parse = request.split(" ");
         Map parseMap = new HashMap<String, String>();
         parseMap.put("method", parse[0]);
-        parseMap.put("URL", parse[1]);
+  
+        int index = parse[1].indexOf("?");
+        String requestPath  = parse[1];
+        if(index > 0 )
+        {
+            requestPath = parse[1].substring(0, index);
+            String params = parse[1].substring(index + 1);
+        	//System.out.println("<help> :" + params);
+            parseMap.put("params", params);
+        }
+        
+        parseMap.put("URL", requestPath);
         parseMap.put("Version", parse[2]);
         return parseMap;
+    }
+    
+    public static String getExt(String fullName)
+    {
+		int pos = fullName.lastIndexOf(".");
+		if(pos > 0)
+		{
+		   String ext = fullName.substring( pos + 1 );
+		   return ext;
+		}
+		return null;
     }
 }
