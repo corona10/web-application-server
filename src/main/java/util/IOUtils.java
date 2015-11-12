@@ -15,4 +15,13 @@ public class IOUtils {
 		br.read(body, 0, contentLength);
 		return String.copyValueOf(body);
 	}
+	
+	public static String getExt(String fullName) {
+		int pos = fullName.lastIndexOf(".");
+		if (pos > 0) {
+			String ext = fullName.substring(pos + 1);
+			return ext;
+		}
+		return null;
+	}
 }
