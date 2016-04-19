@@ -8,8 +8,8 @@ import model.UserDB;
 
 public class App {
 
-  public static void route(DataOutputStream dos, String url) {
-    response302Header(dos, url);
+  public static void route(DataOutputStream dos, String url,boolean isLogin) {
+    response302Header(dos, url, isLogin);
   }
 
   public synchronized static void InsertDB(String id, User user) {
@@ -32,10 +32,12 @@ public class App {
     return false;
   }
 
-  private static void response302Header(DataOutputStream dos, String url) {
+  private static void response302Header(DataOutputStream dos, String url, boolean isLogin) {
     // TODO Auto-generated method stub
     try {
       dos.writeBytes("HTTP/1.1 302 Found \r\n");
+      if(isLogin)
+        dos.writeBytes("Set-Cookie: logined=true\r\n");
       dos.writeBytes("Location: " + url + " \r\n");
       dos.writeBytes("\r\n");
     } catch (IOException e) {

@@ -47,11 +47,13 @@ public class RequestHandler extends Thread {
          * 정규 표현식으로 Request line 헤더임을 확인하고 맞으면 헤더 형식에 맞춰 파싱한다. 패킷의 첫번째 줄이 아래
          * 형식이면 빈줄이 나올 때까지는 헤더이다.
          */
+        // System.out.println(request);
         if (header.isFirstHeader(request)) {
           header.setFirstRequestLine(request);
           url = header.get("URL");
         } else {
           header.setHeader(request);
+          System.out.println(request);
         }
       }
 
@@ -91,15 +93,17 @@ public class RequestHandler extends Thread {
             String email = user_info[3].split("=")[1];
             User user = new User(id, pw, name, email);
             App.InsertDB(id, user);
-            App.route(dos, "/index.html");
-          }else if (route_url.equalsIgnoreCase("/login")) {
+            App.route(dos, "/index.html", false);
+          } else if (route_url.equalsIgnoreCase("/login")) {
             String[] user_info = header.get("params").split("&");
             System.out.println(header.get("params"));
             String id = user_info[0].split("=")[1];
             String pw = user_info[1].split("=")[1];
-            App.FindUser(id, pw);
-            App.route(dos, "/index.html");
-          }else{
+            if (App.FindUser(id, pw)) {
+              App.route(dos, "/index.html", true);
+            }
+            App.route(dos, "/index.html", true);
+          } else {
             response404Header(dos);
           }
         }
@@ -112,10 +116,9 @@ public class RequestHandler extends Thread {
   private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String ContentType, boolean isLogin) {
     try {
       dos.writeBytes("HTTP/1.1 200 OK \r\n");
-      if(isLogin)
+      dos.writeBytes("Content-Type: " + ContentType + ";charset=utf-8\r\n");
+      if (isLogin)
         dos.writeBytes("Set-Cookie: logined=true\r\n");
-      else
-        dos.writeBytes("Content-Type: " + ContentType + ";charset=utf-8\r\n");
       dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
       dos.writeBytes("\r\n");
     } catch (IOException e) {
