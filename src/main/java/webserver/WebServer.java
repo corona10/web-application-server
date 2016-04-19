@@ -13,8 +13,6 @@ import model.User;
 public class WebServer {
 	private static final Logger log = LoggerFactory.getLogger(WebServer.class);
 	private static final int DEFAULT_PORT = 8080;
-
-    static Map user_db = new TreeMap<String, User>(); 
     
     public static void main(String argv[]) throws Exception {
         // 서버소켓을 생성한다. 웹서버는 기본적으로 8080번 포트를 사용한다.
