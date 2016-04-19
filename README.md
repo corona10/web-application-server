@@ -1,5 +1,5 @@
-web-application-server
+Simple HTTP 서버 
 ======================
-
-웹 애플리케이션 서버 실습을 위한 뼈대
-웹서버 실행 후 http://127.0.0.1:8080/index.htm로 접속하면 된다.
+* Simple HTTP Server Implementation based on Java Socket
+* After launch this server you can connect to http://127.0.0.1:8080/index.html
+* This server handle basic GET, POST handling with 200, 404, 302 Message.
